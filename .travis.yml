@@ -1,0 +1,28 @@
+language: cpp
+compiler: gcc
+
+env:
+  global:
+    - IDE_VERSION=1.8.12
+  matrix:
+    - BOARD="arduino:avr:uno"
+    - BOARD="arduino:samd:mkrzero"
+
+install:
+  - wget http://downloads.arduino.cc/arduino-$IDE_VERSION-linux64.tar.xz
+  - tar xf arduino-$IDE_VERSION-linux64.tar.xz
+  - mv arduino-$IDE_VERSION $HOME/arduino-ide
+  - export PATH=$PATH:$HOME/arduino-ide
+  - if [[ "$BOARD" =~ "arduino:samd:" ]]; then arduino --install-boards arduino:samd; fi
+  
+  # install dependancy libraries in library.properties
+  - grep "depends=" $TRAVIS_BUILD_DIR/library.properties | sed 's/depends=//' | sed -n 1'p' |  tr ',' '\n' | while read word; do arduino --install-library "$word"; done
+  
+  - buildExampleSketch() { arduino --verbose-build --verify --board $BOARD $PWD/examples/$1/$1.ino; }
+  - mkdir -p $HOME/Arduino/libraries
+  - ln -s $PWD/src $HOME/Arduino/libraries/MCP2515_nb
+
+script:
+  - buildExampleSketch CANReceiver
+  - buildExampleSketch CANReceiverCallback
+  - buildExampleSketch CANSender
