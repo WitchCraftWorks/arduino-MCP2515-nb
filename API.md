@@ -21,7 +21,7 @@ All following function definitions are methods on the `MCP2515` class, which mea
 that they need to be called like this (i.e. for `begin`):
 
 ```arduino
-MCP.begfin(50e6);
+MCP.begin(50e6);
 ```
 
 ## Begin
@@ -80,6 +80,8 @@ Some logic level converters cannot support high speeds such as 10 MHz, so a lowe
 ## Set Clock Frequency
 
 Override the default clock source frequency that is connected to the MCP2515. **Must** be called before `MCP.begin(...)`.
+
+Currenly supported is 8 and 16 MHz.
 
 ```arduino
 void setClockFrequency(long clockFrequency);
@@ -162,6 +164,8 @@ The following interrupts will be enabled: RX, TX, MERR (message error), WAK (wak
 Which means the CAN controller can be used to wakeup the MCU when bus activity is detected (CAN controller needs to be put to sleep).
 
 **Note: Currently only SAMD supports multiple MCP instances (one MCP per interrupt pin)! All other architectures support only ONE MCP instance globally.**
+
+Feel free to open a pull request if an architecture supports multiple MCP instances (check SAMD implementation).
 
 ## Sending packet
 
@@ -273,7 +277,7 @@ The CAN controller can be put into different operation modes.
 ## Listen-Only mode
 
 Put the CAN controller in Listen-Only mode, this mode provides a means to receive all messages (including messages with errors).
-Listen-Only mode is a silent mode, meaning no messages will be transmitted while in this mode (including error flags or acknowledge signals).
+Listen-Only mode is a silent mode, meaning no messages will be transmitted while in this mode (including error flags and acknowledge signals).
 
 ```arduino
 int setListenMode(bool allowInvalidPackets = false);
@@ -293,7 +297,7 @@ Returns a `MCP2515_ERRORCODES` enum integer (all errors are negative integers).
 
 ## Loopback mode
 
-Put the CAN controller into loopback mode, any outgoing packets will also be received. No other packets can be received.
+Put the CAN controller into loopback mode, any outgoing packets will also be received. No other packets can be received. No packets will be physically written to the CAN bus.
 
 ```arduino
 int setLoopbackMode();
