@@ -8,19 +8,6 @@
 #include "CANPacket.h"
 
 static inline __attribute__((always_inline))
-unsigned char hammingDistance(int x, int y) {
-    unsigned char distance = 0;
-    int xorXY = x ^ y;
-
-    for (unsigned int i = 0; i < (8 * sizeof(int)); i++) {
-        if (xorXY & (1 << i))
-            distance++;
-    }
-
-    return distance;
-}
-
-static inline __attribute__((always_inline))
 int determineReturnCodeByPacketStatus(CANPacket* packet) {
     if (packet->getStatus() & CANPacket::STATUS_TX_SENT) {
         return MCP2515_ERRORCODES::OK;
