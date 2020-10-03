@@ -9,7 +9,7 @@
 #include "MCP2515.h"
 
 CANPacket::CANPacket() {
-
+    memset(_data, 0, sizeof(_data));
 }
 
 CANPacket::~CANPacket() {
@@ -64,8 +64,6 @@ int CANPacket::startStandard(int id, int dlc, bool rtr) {
     _rtr = rtr;
     _dlc = dlc;
     _dataLength = 0;
-
-    memset(_data, 0x00, sizeof(_data));
 
     return MCP2515_ERRORCODES::OK;
 }
