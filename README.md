@@ -6,7 +6,7 @@ This library supports "non-blocking" write packet operations. Which means this l
 onto the CAN bus. The library supports defer checking the status to a later time. However that means that no new packet can be written to the TX buffer
 of the CAN controller until the library has confirmed the status of the CAN packet.
 
-Thus there are two waits to make this efficient: Using interrupts (for both RX and TX parts) or periodic check (i.e. at the start of your `loop` function).
+Thus there are two ways to make this efficient: Using interrupts (for both RX and TX parts) or periodic check (i.e. at the start of your `loop` function).
 Recommendation is clearly using the interrupts approach as it's more efficient. If you prefer the periodic check, call `MCP.processTxQueue()` at the top of your
 `loop` function. The function will also send any queued CAN packet (automatically done when using interrupts).
 
