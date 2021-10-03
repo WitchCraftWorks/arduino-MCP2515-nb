@@ -184,7 +184,9 @@ size_t getTxQueueLength();
 ```
 
 If sending the packet fails, the packet will NOT be automatically removed from the TX buffer on bus transmission errors (return value = `BADF`).
-You need to either set the one-shot mode (which will make the CAN controller remove the packet automatically) or call `abortPacket` (if nowait = false).
+That means the CAN controller will continue to try to send the message on the bus.
+
+You need to either set the one-shot mode (which will make the CAN controller remove the packet automatically) or call `abortPacket` (if nowait = false) to get the packet removed on first try (succeed or fail).
 
 ```arduino
 int setOneShotMode(bool enable);
@@ -274,10 +276,10 @@ int waitForPacketStatus(CANPacket* packet, unsigned long status, bool nowait = f
 
 The CAN controller can be put into different operation modes.
 
-## Listen-Only mode
+## Listen-only mode
 
-Put the CAN controller in Listen-Only mode, this mode provides a means to receive all messages (including messages with errors).
-Listen-Only mode is a silent mode, meaning no messages will be transmitted while in this mode (including error flags and acknowledge signals).
+Put the CAN controller in Listen-only mode, this mode provides a means to receive all messages (including messages with errors).
+Listen-only mode is a silent mode, meaning no messages will be transmitted while in this mode (including error flags and acknowledge signals).
 
 ```arduino
 int setListenMode(bool allowInvalidPackets = false);
@@ -314,7 +316,7 @@ Returns a `MCP2515_ERRORCODES` enum integer (all errors are negative integers).
 
 ## Sleep mode
 
-Put the CAN contoller into sleep mode.
+Put the CAN contoller into sleep mode. If you have enabled interrupts receive, the CAN controller will wake the CPU up on bus activity (if the CPU is in sleep).
 
 ```arduino
 int setSleepMode();
@@ -369,13 +371,8 @@ Returns a `MCP2515_ERRORCODES` enum integer (all errors are negative integers).
 
 ## Disabling async TX queue
 
-The TX queue can be disabled by defining `MCP2515_DISABLE_ASYNC_TX_QUEUE` before `include`ing the library. This will remove at compile-time the queue used for sending `CANPacket`s asynchronously.
-
-For example:
-```arduino
-#define MCP2515_DISABLE_ASYNC_TX_QUEUE 1
-#include <MCP2515_nb.h>
-```
+The TX queue can be disabled by defining `MCP2515_DISABLE_ASYNC_TX_QUEUE` inside the library (i.e. in `MCP2515_nb.h` before the includes).
+This will remove at compile-time the queue used for sending `CANPacket`s asynchronously.
 
 With the following changes come along with it:
 * `getTxQueueLength` will always return `0`.
